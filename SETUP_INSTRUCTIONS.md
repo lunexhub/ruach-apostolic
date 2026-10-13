@@ -1,85 +1,49 @@
-# Setup Instructions - Fix Registration Issue
+# Setup Instructions - Registration Form
 
-## Problem
-Registration fails with "Your registration could not be saved. Please try again."
+## How It Works
 
-## Root Cause
-Missing `SUPABASE_SERVICE_ROLE_KEY` environment variable and database table not created.
+This registration form sends data **directly to WhatsApp** without requiring a database.
 
-## Solution
+### Flow:
+1. User fills out the registration form
+2. Form validates the data
+3. User is redirected to WhatsApp with pre-filled message
+4. User clicks "Send" to submit to **078 029 6688**
 
-### Step 1: Get Your Supabase Service Role Key
+## No Database Setup Required! ✅
 
-1. Go to your Supabase dashboard: https://supabase.com/dashboard/project/sjkxxoqgyeovnfqsdbca
-2. Click on **Settings** (gear icon) in the left sidebar
-3. Click on **API** 
-4. Scroll down to **Project API keys**
-5. Copy the **service_role** key (⚠️ Keep this secret!)
+The app has been simplified to skip database storage entirely. All registrations go straight to WhatsApp.
 
-### Step 2: Update Local Environment Variables
-
-1. Open the `.env` file in this project
-2. Replace `YOUR_SERVICE_ROLE_KEY_HERE` with your actual service role key:
-   ```
-   SUPABASE_SERVICE_ROLE_KEY="eyJhbGc...your-actual-key-here"
-   ```
-
-### Step 3: Create the Database Table
-
-Run this SQL in your Supabase SQL Editor (https://supabase.com/dashboard/project/sjkxxoqgyeovnfqsdbca/sql/new):
-
-```sql
-CREATE TABLE public.course_registrations (
- id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
- created_at timestamptz NOT NULL DEFAULT now(),
- name text NOT NULL CHECK (char_length(name) BETWEEN 1 AND 100),
- surname text NOT NULL CHECK (char_length(surname) BETWEEN 1 AND 100),
- dob date NOT NULL,
- email text NOT NULL CHECK (char_length(email) <= 255),
- address text NOT NULL CHECK (char_length(address) BETWEEN 1 AND 500),
- phone text NOT NULL CHECK (char_length(phone) BETWEEN 7 AND 25),
- church_name text NOT NULL CHECK (char_length(church_name) BETWEEN 1 AND 200),
- gifting text NOT NULL CHECK (char_length(gifting) BETWEEN 1 AND 200),
- reason text NOT NULL CHECK (char_length(reason) BETWEEN 1 AND 2000)
-);
-
-GRANT ALL ON public.course_registrations TO service_role;
-ALTER TABLE public.course_registrations ENABLE ROW LEVEL SECURITY;
-```
-
-Click **Run** to execute the SQL.
-
-### Step 4: Update Vercel Environment Variables
-
-1. Go to your Vercel dashboard: https://vercel.com/lunexhubs-projects/prophetic-school-signup-main/settings/environment-variables
-2. Add the following environment variable:
-   - **Name:** `SUPABASE_SERVICE_ROLE_KEY`
-   - **Value:** (paste your service role key from Step 1)
-   - **Environment:** Production, Preview, Development (select all)
-3. Click **Save**
-4. Go to **Deployments** and click **Redeploy** on the latest deployment
-
-### Step 5: Test Locally
+## Local Development
 
 ```bash
+npm install
 npm run dev
 ```
 
-Then test the registration form at http://localhost:3000
+Visit http://localhost:3000 to test the form.
 
-### Step 6: Test Production
+## Production Deployment
 
-Visit https://prophetic-school-signup-main.vercel.app and test the registration.
+The app is already deployed to Vercel and will automatically redeploy when you push to the `main` branch.
 
-## Security Note
+**Live URL:** https://prophetic-school-signup-main.vercel.app
 
-⚠️ **NEVER commit the `.env` file to Git!** 
+## Environment Variables (Optional)
 
-The `.env` file is already in `.gitignore` to prevent accidentally exposing your secrets.
+The Supabase environment variables in `.env` are not used since we removed database storage. You can ignore them or remove them if you want.
 
-## What This Does
+## WhatsApp Integration
 
-- The Service Role Key allows server-side operations to bypass Row Level Security (RLS)
-- The table stores all registration submissions
-- Only the server can write to this table (users cannot read or write directly)
-- Submissions are private and secure
+The WhatsApp number is hardcoded to: **27780296688** (South African format: 078 029 6688)
+
+To change it, edit: `src/lib/registration-schema.ts` line with `wa.me/27780296688`
+
+## Features
+
+- ✅ Full form validation (name, email, phone, date of birth, etc.)
+- ✅ Character limits on all fields
+- ✅ Beautiful, responsive UI
+- ✅ Direct WhatsApp integration
+- ✅ Pre-formatted message with all registration details
+- ✅ No database required - simple and fast!

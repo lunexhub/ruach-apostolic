@@ -1,12 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { useServerFn } from '@tanstack/react-start';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowUpRight, CheckCircle2, Church, Feather, LockKeyhole, MessageCircle, ShieldCheck, UserRound, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { registrationSchema, whatsappUrl, type Registration } from '@/lib/registration-schema';
-import { submitRegistration } from '@/lib/registration.functions';
 import eagle from '@/assets/eagle.png';
 import logo from '@/assets/logo.png';
 import socialImg from '@/assets/ruach-social.png';
@@ -31,25 +29,17 @@ export const Route = createFileRoute('/')({
 });
 
 function Index() {
- const submit = useServerFn(submitRegistration);
  const [savedUrl, setSavedUrl] = useState('');
- const [submitError, setSubmitError] = useState('');
  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<Registration>({ resolver: zodResolver(registrationSchema), defaultValues: { reason: '' } });
  const reason = watch('reason') || '';
  async function onSubmit(data: Registration) {
-  setSubmitError('');
-  // Reserve a tab during the click so browsers do not block it after saving.
+  // Open WhatsApp directly - no server call needed
   const tab = window.open('about:blank', '_blank');
   if (tab) tab.opener = null;
-  try {
-   await submit({ data });
-   const url = whatsappUrl(data);
-   setSavedUrl(url);
-   if (tab) tab.location.href = url;
-  } catch {
-   tab?.close();
-   setSubmitError('Your registration could not be saved. Please try again.');
-  }
+  
+  const url = whatsappUrl(data);
+  setSavedUrl(url);
+  if (tab) tab.location.href = url;
  }
  function field(key: keyof Registration, label: string, placeholder: string, type = 'text', wide = false) {
   return <div className={`field ${wide ? 'field-wide' : ''}`}><label htmlFor={key}>{label} <span className="required-star">*</span></label><input id={key} type={type} placeholder={placeholder} {...register(key)} maxLength={key === 'address' ? 500 : key === 'email' ? 255 : key === 'phone' ? 25 : key === 'church_name' || key === 'gifting' ? 200 : 100} autoComplete={key === 'name' ? 'given-name' : key === 'surname' ? 'family-name' : key === 'dob' ? 'bday' : key === 'email' ? 'email' : key === 'phone' ? 'tel' : key === 'address' ? 'street-address' : 'off'} aria-required="true" aria-invalid={Boolean(errors[key])} aria-describedby={errors[key] ? `${key}-error` : undefined} />{errors[key] && <p className="field-error" id={`${key}-error`}>{errors[key]?.message}</p>}</div>;
@@ -64,7 +54,7 @@ function Index() {
      <fieldset className="form-section"><legend><UserRound/> Personal information</legend><div className="field-grid">{field('name','Name','Your first name')}{field('surname','Surname','Your surname')}{field('dob','Date of birth','','date')}</div></fieldset>
      <fieldset className="form-section"><legend><MessageCircle/> Contact details</legend><div className="field-grid">{field('email','Email address','you@example.com','email')}{field('phone','Phone number','e.g. 082 123 4567','tel')}{field('address','Address','Street address, suburb, city and postal code','text',true)}</div></fieldset>
      <fieldset className="form-section"><legend><Church/> Church & calling</legend><div className="field-grid">{field('church_name','Church name','Your home church')}{field('gifting','Area of gifting','Your spiritual gifting')}<div className="field field-wide"><label htmlFor="reason">Reason for attending the course <span className="required-star">*</span></label><textarea id="reason" {...register('reason')} maxLength={2000} placeholder="Share what has inspired you to attend this course…" aria-required="true" aria-invalid={Boolean(errors.reason)} aria-describedby={errors.reason ? 'reason-error' : undefined}/>{errors.reason && <p className="field-error" id="reason-error">{errors.reason.message}</p>}<div className="character-count">{reason.length} / 2000</div></div></div></fieldset>
-     <div className="submit-area">{submitError && <p role="alert" className="field-error mb-3">{submitError}</p>}<Button type="submit" disabled={isSubmitting} className="submit-button">{isSubmitting ? <LoaderCircle className="animate-spin"/> : <MessageCircle/>}{isSubmitting ? 'Saving registration…' : 'Register via WhatsApp'}{!isSubmitting && <ArrowUpRight/>}</Button><div className="privacy-note"><LockKeyhole size={11}/> Saved privately. Shared with the school when you send on WhatsApp.</div></div>
+     <div className="submit-area"><Button type="submit" disabled={isSubmitting} className="submit-button">{isSubmitting ? <LoaderCircle className="animate-spin"/> : <MessageCircle/>}{isSubmitting ? 'Opening WhatsApp…' : 'Register via WhatsApp'}{!isSubmitting && <ArrowUpRight/>}</Button><div className="privacy-note"><LockKeyhole size={11}/> Opens WhatsApp with your registration details pre-filled.</div></div>
     </form>}
    </div>
   </main><footer className="site-footer"><span>© 2026 Ruach Apostolic & Prophetic Training School</span><span className="flex items-center gap-1.5"><ShieldCheck size={12}/> Faith. Purpose. Calling.</span></footer>
