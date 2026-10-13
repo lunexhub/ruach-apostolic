@@ -41,7 +41,7 @@ To change it, edit: `src/lib/registration-schema.ts` line with `wa.me/2778029668
 
 ## Features
 
-- ✅ Full form validation (name, email, phone, date of birth, etc.)
+- ✅ Full form validation (name, email, phone, age, etc.)
 - ✅ Character limits on all fields
 - ✅ Beautiful, responsive UI
 - ✅ Direct WhatsApp integration

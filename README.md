@@ -5,7 +5,7 @@ A modern registration form for the Ruach Apostolic & Prophetic Training School.
 ## Features
 
 - Student registration with comprehensive information collection
-- Name, Surname, Date of Birth, Address
+- Name, Surname, Age, Address
 - Contact Details
 - Church Name
 - Area of Gifting
