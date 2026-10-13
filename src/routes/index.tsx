@@ -32,14 +32,21 @@ function Index() {
  const [savedUrl, setSavedUrl] = useState('');
  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<Registration>({ resolver: zodResolver(registrationSchema), defaultValues: { reason: '' } });
  const reason = watch('reason') || '';
- async function onSubmit(data: Registration) {
-  // Open WhatsApp directly - no server call needed
-  const tab = window.open('about:blank', '_blank');
-  if (tab) tab.opener = null;
-  
+ function onSubmit(data: Registration) {
   const url = whatsappUrl(data);
   setSavedUrl(url);
-  if (tab) tab.location.href = url;
+  const tab = window.open(url, '_blank');
+  if (!tab || tab.closed || typeof tab.closed === 'undefined') {
+   window.location.href = url;
+  }
+ }
+ function onError(formErrors: Record<string, unknown>) {
+  const firstKey = Object.keys(formErrors)[0];
+  if (firstKey) {
+   const el = document.getElementById(firstKey);
+   el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+   el?.focus();
+  }
  }
  function field(key: keyof Registration, label: string, placeholder: string, type = 'text', wide = false) {
   return <div className={`field ${wide ? 'field-wide' : ''}`}><label htmlFor={key}>{label} <span className="required-star">*</span></label><input id={key} type={type} placeholder={placeholder} {...register(key)} maxLength={key === 'address' ? 500 : key === 'email' ? 255 : key === 'phone' ? 25 : key === 'church_name' || key === 'gifting' ? 200 : 100} autoComplete={key === 'name' ? 'given-name' : key === 'surname' ? 'family-name' : key === 'dob' ? 'bday' : key === 'email' ? 'email' : key === 'phone' ? 'tel' : key === 'address' ? 'street-address' : 'off'} aria-required="true" aria-invalid={Boolean(errors[key])} aria-describedby={errors[key] ? `${key}-error` : undefined} />{errors[key] && <p className="field-error" id={`${key}-error`}>{errors[key]?.message}</p>}</div>;
@@ -50,7 +57,7 @@ function Index() {
   <main className="main-layout">
    <aside className="sidebar"><div className="sidebar-eyebrow">Your next chapter</div><h2>Answer the calling.<br/>Begin your journey.</h2><div className="section-index"><span className="index-number">01</span> Personal information</div><div className="section-index"><span className="index-number">02</span> Contact details</div><div className="section-index"><span className="index-number">03</span> Church & calling</div><div className="sidebar-bottom">Have a question?<br/>Connect with the school.<a href="https://wa.me/27780296688" target="_blank" rel="noopener noreferrer"><MessageCircle size={15}/> 078 029 6688 <ArrowUpRight size={13}/></a></div></aside>
    <div><div className="form-heading"><h2>Course registration</h2><span className="required-note"><span className="required-star">*</span> Required fields</span></div>
-    {savedUrl ? <section className="success" role="status"><CheckCircle2 className="text-primary" size={30}/><h3>Your registration is saved.</h3><p>Complete your registration by sending the prepared message to the school on WhatsApp.</p><Button asChild className="submit-button"><a href={savedUrl} target="_blank" rel="noopener noreferrer"><MessageCircle/> Continue to WhatsApp <ArrowUpRight/></a></Button></section> : <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    {savedUrl ? <section className="success" role="status"><CheckCircle2 className="text-primary" size={30}/><h3>Your registration is saved.</h3><p>Complete your registration by sending the prepared message to the school on WhatsApp.</p><Button asChild className="submit-button"><a href={savedUrl} target="_blank" rel="noopener noreferrer"><MessageCircle/> Continue to WhatsApp <ArrowUpRight/></a></Button></section> : <form onSubmit={handleSubmit(onSubmit, onError)} noValidate>
      <fieldset className="form-section"><legend><UserRound/> Personal information</legend><div className="field-grid">{field('name','Name','Your first name')}{field('surname','Surname','Your surname')}{field('dob','Date of birth','','date')}</div></fieldset>
      <fieldset className="form-section"><legend><MessageCircle/> Contact details</legend><div className="field-grid">{field('email','Email address','you@example.com','email')}{field('phone','Phone number','e.g. 082 123 4567','tel')}{field('address','Address','Street address, suburb, city and postal code','text',true)}</div></fieldset>
      <fieldset className="form-section"><legend><Church/> Church & calling</legend><div className="field-grid">{field('church_name','Church name','Your home church')}{field('gifting','Area of gifting','Your spiritual gifting')}<div className="field field-wide"><label htmlFor="reason">Reason for attending the course <span className="required-star">*</span></label><textarea id="reason" {...register('reason')} maxLength={2000} placeholder="Share what has inspired you to attend this course…" aria-required="true" aria-invalid={Boolean(errors.reason)} aria-describedby={errors.reason ? 'reason-error' : undefined}/>{errors.reason && <p className="field-error" id="reason-error">{errors.reason.message}</p>}<div className="character-count">{reason.length} / 2000</div></div></div></fieldset>
