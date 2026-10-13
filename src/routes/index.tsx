@@ -7,12 +7,12 @@ import { ArrowUpRight, CheckCircle2, Church, Feather, LockKeyhole, MessageCircle
 import { Button } from '@/components/ui/button';
 import { registrationSchema, whatsappUrl, type Registration } from '@/lib/registration-schema';
 import { submitRegistration } from '@/lib/registration.functions';
-import eagle from '@/assets/eagle.png.asset.json';
-import logo from '@/assets/logo.png.asset.json';
-import social from '@/assets/social.png.asset.json';
+import eagle from '@/assets/eagle.png';
+import logo from '@/assets/logo.png';
+import socialImg from '@/assets/ruach-social.png';
 
-// Use relative path for social share image
-const shareImageUrl = social.url;
+// Use direct path for social share image
+const shareImageUrl = socialImg;
 
 export const Route = createFileRoute('/')({
  head: () => ({ meta: [
@@ -55,8 +55,8 @@ function Index() {
   return <div className={`field ${wide ? 'field-wide' : ''}`}><label htmlFor={key}>{label} <span className="required-star">*</span></label><input id={key} type={type} placeholder={placeholder} {...register(key)} maxLength={key === 'address' ? 500 : key === 'email' ? 255 : key === 'phone' ? 25 : key === 'church_name' || key === 'gifting' ? 200 : 100} autoComplete={key === 'name' ? 'given-name' : key === 'surname' ? 'family-name' : key === 'dob' ? 'bday' : key === 'email' ? 'email' : key === 'phone' ? 'tel' : key === 'address' ? 'street-address' : 'off'} aria-required="true" aria-invalid={Boolean(errors[key])} aria-describedby={errors[key] ? `${key}-error` : undefined} />{errors[key] && <p className="field-error" id={`${key}-error`}>{errors[key]?.message}</p>}</div>;
  }
  return <>
-  <header className="site-header"><a className="brand" href="/" aria-label="Ruach home"><img src={logo.url} width={42} height={42} alt="Ruach bird logo"/><div><div className="brand-name">RUACH</div><div className="brand-sub">Apostolic & Prophetic</div></div></a><div className="header-note"><Feather size={14}/> A calling. A purpose. A new beginning.</div></header>
-  <section className="hero"><img className="hero-image" src={eagle.url} width={1536} height={1024} alt="An eagle soaring above green mountains at sunrise"/><div className="hero-content"><div className="eyebrow">Prophetic School</div><h1>Ruach Apostolic &<br/>Prophetic Training School</h1><p className="hero-tagline">Where Eagles shall Sow Prophetic School</p><div className="hero-label"><Feather size={14}/> Course registration</div></div></section>
+  <header className="site-header"><a className="brand" href="/" aria-label="Ruach home"><img src={logo} width={42} height={42} alt="Ruach bird logo"/><div><div className="brand-name">RUACH</div><div className="brand-sub">Apostolic & Prophetic</div></div></a><div className="header-note"><Feather size={14}/> A calling. A purpose. A new beginning.</div></header>
+  <section className="hero"><img className="hero-image" src={eagle} width={1536} height={1024} alt="An eagle soaring above green mountains at sunrise"/><div className="hero-content"><div className="eyebrow">Prophetic School</div><h1>Ruach Apostolic &<br/>Prophetic Training School</h1><p className="hero-tagline">Where Eagles shall Sow Prophetic School</p><div className="hero-label"><Feather size={14}/> Course registration</div></div></section>
   <main className="main-layout">
    <aside className="sidebar"><div className="sidebar-eyebrow">Your next chapter</div><h2>Answer the calling.<br/>Begin your journey.</h2><div className="section-index"><span className="index-number">01</span> Personal information</div><div className="section-index"><span className="index-number">02</span> Contact details</div><div className="section-index"><span className="index-number">03</span> Church & calling</div><div className="sidebar-bottom">Have a question?<br/>Connect with the school.<a href="https://wa.me/27780296688" target="_blank" rel="noopener noreferrer"><MessageCircle size={15}/> 078 029 6688 <ArrowUpRight size={13}/></a></div></aside>
    <div><div className="form-heading"><h2>Course registration</h2><span className="required-note"><span className="required-star">*</span> Required fields</span></div>
